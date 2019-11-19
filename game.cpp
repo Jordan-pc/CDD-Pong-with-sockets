@@ -271,8 +271,6 @@ char getch2(void)
     return buf;
  }
 
-
-
 void gotoxy(int x, int y){
     printf("%c[%d;%df",0x1B,y,x);
 }
@@ -301,15 +299,15 @@ class jugador{
         void dibujar() const;
         void borrar() const;
         void moverse(int _y);
+        int RX() {return x;}
+        int RY() {return y;}
 };
 
 jugador::jugador(int _x,int _y){
     x = _x; y = _y;
 }
 
-jugador::~jugador(){
-    printf("delete jugador");
-}
+jugador::~jugador(){}
 
 void jugador::dibujar() const{
     gotoxy(x,y); printf("#");
@@ -346,18 +344,17 @@ class pelota{
     public:
         pelota(int _x,int _y, int _dx, int _dy);
         ~pelota();
+        void setpos(int _x, int _y) { x = _x; y = _y;}
         void dibujar() const;
         void borrar() const;
-        void moverse();
+        void moverse(jugador a, jugador b);
 };
 
 pelota::pelota(int _x,int _y, int _dx, int _dy){
     x = _x; y = _y; dx = _dx; dy = _dy;
 }
 
-pelota::~pelota(){
-    printf("delete pelota");
-}
+pelota::~pelota(){}
 
 void pelota::dibujar() const{
     gotoxy(x,y); printf("*"); printf("\e[?25l");
@@ -367,30 +364,31 @@ void pelota::borrar() const{
     gotoxy(x,y); printf(" "); printf("\e[?25l");
 }
 
-void pelota::moverse(){
+void pelota::moverse(jugador a, jugador b){
     borrar();
     x += dx;
     y += dy;
     dibujar();
-    if(x + dx == 1 || x + dx == 79) dx = -dx;
+    if(x + dx == 1 || x + dx == 79) {borrar();dx = -dx; setpos(39,11);}
     if(y + dy == 1 || y + dy == 24) dy = -dy;
+    if(x + dx == a.RX() && y >= a.RY() && y <= a.RY() + 5 ) dx = -dx;
+    if(x + dx == b.RX() && y >= b.RY() && y <= b.RY() + 5 ) dx = -dx;
 }
 
-
-
+jugador player_1(6,9);
+jugador player_2(74,9);
 
 void *movimiento_pelota(void *data){
-    jugador jugadors(6,9);
-    jugadors.dibujar();
+    player_1.dibujar();
     //pelota ball2(39,11,1,1);
     //ball2.dibujar();
     while (true){
         char c = getch2();
             if (c == 'w' || c == 'W'){
-                jugadors.moverse(-1);
+                player_1.moverse(-1);
             }
             else if(c == 's' || c == 'S'){
-                jugadors.moverse(1);
+                player_1.moverse(1);
             }
         //ball2.moverse();
         // usleep(500);
@@ -403,7 +401,6 @@ void *movimiento_pelota(void *data){
 
 int main(int argc, char** argv) {
     pthread_t proceso_pelota;
-    jugador player_1(6,9),player_2(74,9);
     pelota ball(39,11,1,1);
     dibujar_tablero();
     //player_1.dibujar();
@@ -424,8 +421,8 @@ int main(int argc, char** argv) {
             //     player_1.moverse(1);
             // }
         //}
-        ball.moverse(); 
-        usleep(85000);
+        ball.moverse(player_1,player_2); 
+        usleep(65000);
         fflush(NULL);
         // setbuf(stdin,NULL);
         // __fpurge;
