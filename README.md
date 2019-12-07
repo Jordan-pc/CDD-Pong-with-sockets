@@ -19,7 +19,7 @@ O tambien se puede realizar de la siguiente forma: `g++ game.cpp -o game -pthrea
 
 Para probarlo basta con ejecutar en orden el servidor primero y despues el juego  por ende seria de la siguiente forma, en una consola se ejecuta el servidor con `./server`.
 
-En otra consola habra que ejecutar el juego de la siguiente forma `./game servidor puerto` en este caso el puerto default es 7777
+En otra consola habra que ejecutar el juego de la siguiente forma `./game servidor puerto` en este caso el puerto default es 7777, el servidor es la direccion ipv4, la cual se puede ver en la configuracion de internet en ubuntu(en nuestro caso 10.0.2.15) por lo cual para ejecutarlo quedo de la siguiente forma: `./game 10.0.2.15 7777`
 
 Una vez realizado esto se enviara un mensaje para avisar que aun falta el jugador dos, este puede entrar desde otra computadora conectada a la misma red o abriendo otra consola y realizando los mismos pasos mencionados anteriormente.
 
