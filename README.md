@@ -17,9 +17,9 @@ En caso de querer compilar por separado se puede realizar `make game` y despues 
 
 O tambien se puede realizar de la siguiente forma: `g++ game.cpp -o game -pthread` y despues `g++ server.cpp -o server -pthread`
 
-Para probarlo basta con ejecutar en orden el servidor con el juego por ende seria de la siguiente forma, en una consola se ejecuta el servidor con `./server`.
+Para probarlo basta con ejecutar en orden el servidor primero y despues el juego  por ende seria de la siguiente forma, en una consola se ejecuta el servidor con `./server`.
 
-En otra consola habra que ejecutar el servidor de la siguiente forma `./game servidor puerto` en este caso el puerto default es 7777
+En otra consola habra que ejecutar el juego de la siguiente forma `./game servidor puerto` en este caso el puerto default es 7777
 
 Una vez realizado esto se enviara un mensaje para avisar que aun falta el jugador dos, este puede entrar desde otra computadora conectada a la misma red o abriendo otra consola y realizando los mismos pasos mencionados anteriormente.
 
