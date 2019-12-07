@@ -1,253 +1,28 @@
-// int getch(void){
-//     struct termios oldattr, newattr;
-//     int ch;
-//     tcgetattr( STDIN_FILENO, &oldattr );
-//     newattr = oldattr;
-//     newattr.c_lflag &= ~( ICANON | ECHO );
-//     tcsetattr( STDIN_FILENO, TCSANOW, &newattr );
-//     ch = getchar();
-//     tcsetattr( STDIN_FILENO, TCSANOW, &oldattr );
-//     return ch;
-// }
-
-// int getche(void)
-// {
-//     struct termios oldattr, newattr;
-//     int ch;
-//     tcgetattr( STDIN_FILENO, &oldattr );
-//     newattr = oldattr;
-//     newattr.c_lflag &= ~( ICANON );
-//     tcsetattr( STDIN_FILENO, TCSANOW, &newattr );
-//     ch = getchar();
-//     tcsetattr( STDIN_FILENO, TCSANOW, &oldattr );
-//     return ch;
-// }
-
-// int getchp(void) {
-//   struct termios term_settings,term_settings_saved;
-//   char c;
-//   int x;
-//   if (tcgetattr(STDIN_FILENO,&term_settings))
-//     return -2;
-//   term_settings_saved=term_settings;
-//   term_settings.c_lflag &= ~ICANON ;
-//   term_settings.c_lflag &= ~ECHO ;
-//   term_settings.c_cc[VMIN]=0;
-//   term_settings.c_cc[VTIME]=0;
-//   if (tcsetattr (STDIN_FILENO, TCSANOW, &term_settings) < 0)
-//     return -2;
-//   x = getchar();
-//   tcsetattr (STDIN_FILENO, TCSANOW, &term_settings_saved);
-//   return x;
-// }
-
-// int kbhit(void){
-//     struct timeval tv;
-//     fd_set rdfs;
-//     tv.tv_sec = 0;
-//     tv.tv_usec = 0;
-//     FD_ZERO(&rdfs);
-//     FD_SET(STDIN_FILENO, &rdfs);
-//     /*return*/select(STDIN_FILENO+1,&rdfs,NULL,NULL,&tv);
-//     return FD_ISSET(STDIN_FILENO,&rdfs);
-// }
-
-// int kbhit2(void)
-// {
-//   struct termios oldt, newt;
-//   int ch = 0;
-//   int oldf;
-
-//   tcgetattr(STDIN_FILENO, &oldt);
-//   newt = oldt;
-//   newt.c_lflag &= (~ICANON & ~ECHO);
-//   tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-//   oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
-//   fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
-
-//   ch = getch();
-
-
-//   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-//   fcntl(STDIN_FILENO, F_SETFL, oldf);
-
-//   if(ch != EOF)
-//   {
-//     ungetc(ch, stdin);
-//     return 1;
-//   }
-
-//   return 0;
-// }
-
-// void enable_raw_mode()
-// {
-//     termios term;
-//     tcgetattr(0, &term);
-//     term.c_lflag &= ~(ICANON | ECHO); // Disable echo as well
-//     tcsetattr(0, TCSANOW, &term);
-// }
-
-// void disable_raw_mode()
-// {
-//     termios term;
-//     tcgetattr(0, &term);
-//     term.c_lflag |= ICANON | ECHO;
-//     tcsetattr(0, TCSANOW, &term);
-// }
-
-// bool _kbhit()
-// {
-//     int byteswaiting;
-//     ioctl(0, FIONREAD, &byteswaiting);
-//     return byteswaiting > 0;
-// }
-
-
-// class keyboard
-// {
-// public:
-
-//     keyboard();
-//     ~keyboard();
-//     int kbhit();
-//     int getch();
-
-// private:
-
-//     struct termios initial_settings, new_settings;
-//     int peek_character;
-
-// };
-
-// keyboard::keyboard()
-// {
-//     tcgetattr(0,&initial_settings);
-//     new_settings = initial_settings;
-//     new_settings.c_lflag &= ~ICANON;
-//     new_settings.c_lflag &= ~ECHO;
-//     new_settings.c_lflag &= ~ISIG;
-//     new_settings.c_cc[VMIN] = 1;
-//     new_settings.c_cc[VTIME] = 0;
-//     tcsetattr(0, TCSANOW, &new_settings);
-//     peek_character=-1;
-// }
-
-// keyboard::~keyboard()
-// {
-//     tcsetattr(0, TCSANOW, &initial_settings);
-//     printf("keyboard restaured");
-// }
-
-// int keyboard::kbhit()
-// {
-// unsigned char ch;
-// int nread;
-
-//     if (peek_character != -1) return 1;
-//     new_settings.c_cc[VMIN]=0;
-//     tcsetattr(0, TCSANOW, &new_settings);
-//     nread = read(0,&ch,1);
-//     new_settings.c_cc[VMIN]=1;
-//     tcsetattr(0, TCSANOW, &new_settings);
-
-//     if (nread == 1)
-//     {
-//         peek_character = ch;
-//         return 1;
-//     }
-//     return 0;
-// }
-
-// int keyboard::getch()
-// {
-// char ch;
-
-//     if (peek_character != 1)
-//     {
-//         ch = peek_character;
-//         peek_character = -1;
-//     } else read(0,&ch,1);
-
-//     return ch;
-// }
-
-// static struct termios initial_settings, new_settings;
-// static int peek_character = -1;
-
-
-// void init_keyboard() {
-//   tcgetattr(0, &initial_settings);
-
-//   new_settings = initial_settings;
-//   new_settings.c_lflag &= ~ICANON;
-//   new_settings.c_lflag &= ~ECHO;
-//   new_settings.c_lflag &= ~ISIG;
-//   new_settings.c_cc[VMIN] = 1;
-//   new_settings.c_cc[VTIME] = 0;
-//   tcsetattr(0, TCSANOW, &new_settings);
-// }
-
-// void close_keyboard() {
-//   tcsetattr(0, TCSANOW, &initial_settings);
-// }
-
-// int kbhit3() {
-//   char ch;
-//   int nread;
-
-//   if (peek_character != -1) {
-//     return 1;
-//   }
-
-//   new_settings.c_cc[VMIN] = 0;
-//   tcsetattr(0, TCSANOW, &new_settings);
-//   nread = read(0, &ch, 1);
-//   new_settings.c_cc[VMIN] = 1;
-//   tcsetattr(0, TCSANOW, &new_settings);
-
-//   if (nread == 1) {
-//     peek_character = ch;
-//     return 1;
-//   }
-//   return 0;
-// }
-
-// int readch() {
-//   char ch;
-
-//   if (peek_character != 1) {
-//     ch = peek_character;
-//     peek_character = -1;
-//     return ch;
-//   }
-
-//   read(0, &ch, 1);
-//   return ch;
-// }
-
-
 #include <stdio.h>
-#include <stdio_ext.h> //fpuge
-
 #include <stdlib.h>
-#include <string.h>  //nose para que esta, pero la dejo por si acaso por ahora
-
 #include <unistd.h>  //sleep y read creo
-#include <termios.h> //getch2
-
-#include <fcntl.h>     //de aca para abajo cosas del copy paste de arriba
-#include <sys/time.h>
-
-#include <sys/select.h>
-#include <stropts.h>
-#include <sys/ioctl.h>    //fin funciones copy paste
-
+#include <termios.h>
 #include <pthread.h>  //hilos
+#include <iostream>
 
-#include <iostream> //cout
+#include <arpa/inet.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <netdb.h>
 
-using namespace std; //cout
+using namespace std;
+
+int sv,endgame = 0,puntos_p1 = 0,puntos_p2 = 0;
+
+void gamestartmsg(){
+    cout<<"Game start in: "<<endl;
+    for (int i = 3; i > 0; i--){
+        usleep(1000000);
+        cout<<i<<" "<<endl;
+    }
+}
 
 char getch2(void)
 {
@@ -301,6 +76,7 @@ class jugador{
         void moverse(int _y);
         int RX() {return x;}
         int RY() {return y;}
+        void setY(int _y){borrar();y = _y;dibujar();}
 };
 
 jugador::jugador(int _x,int _y){
@@ -369,20 +145,28 @@ void pelota::moverse(jugador a, jugador b){
     x += dx;
     y += dy;
     dibujar();
-    if(x + dx == 1 || x + dx == 79) {borrar();dx = -dx; setpos(39,11);}
+    if(x + dx == 1 || x + dx == 79) {
+        if(x+dx==1)puntos_p1++;
+        else puntos_p2++;
+        borrar();
+        dx = -dx;
+        setpos(39,11);
+        endgame++;
+        }
     if(y + dy == 1 || y + dy == 24) dy = -dy;
-    if(x + dx == a.RX() && y >= a.RY() && y <= a.RY() + 5 ) dx = -dx;
-    if(x + dx == b.RX() && y >= b.RY() && y <= b.RY() + 5 ) dx = -dx;
+    if(x + dx == a.RX() && y >= a.RY() && y <= a.RY() + 1 ) {dx = 1;dy = -1;}
+    if(x + dx == a.RX() && y >= a.RY()+2 && y <= a.RY() + 3 ) {dx = 1; dy = 0;}
+    if(x + dx == a.RX() && y >= a.RY()+4 && y <= a.RY() + 5 ) {dx = 1;dy = 1;}
+    if(x + dx == b.RX() && y >= b.RY() && y <= b.RY() + 1 ) {dx = -1;dy = -1;}
+    if(x + dx == b.RX() && y >= b.RY()+2 && y <= b.RY() + 3 ) {dx = -1; dy = 0;}
+    if(x + dx == b.RX() && y >= b.RY()+4 && y <= b.RY() + 5 ) {dx = -1;dy = 1;}
 }
 
 jugador player_1(6,9);
 jugador player_2(74,9);
 
-void *movimiento_pelota(void *data){
-    player_1.dibujar();
-    //pelota ball2(39,11,1,1);
-    //ball2.dibujar();
-    while (true){
+void *movimiento_jugador1(void *data){
+    while (endgame<3){
         char c = getch2();
             if (c == 'w' || c == 'W'){
                 player_1.moverse(-1);
@@ -390,45 +174,190 @@ void *movimiento_pelota(void *data){
             else if(c == 's' || c == 'S'){
                 player_1.moverse(1);
             }
-        //ball2.moverse();
-        // usleep(500);
         fflush(NULL);
-        // setbuf(stdin,NULL);
-        // __fpurge;
+        string s = to_string(player_1.RY());
+        const char* coordenadas = s.c_str();
+
+        char* mensaje = (char *) calloc(strlen(coordenadas) + 1, sizeof (char));
+        sprintf(mensaje, "%s", coordenadas);
+        int largo_mensaje = strlen(mensaje);
+        send(sv, mensaje, largo_mensaje, 0);
     }
+    std::system("clear");
+    gotoxy(0,0);
+    printf("Presione alguna tecla");
 }
 
+void *movimiento_jugador2(void *data){
+    while (endgame<3){
+        char c = getch2();
+            if (c == 'w' || c == 'W'){
+                player_2.moverse(-1);
+            }
+            else if(c == 's' || c == 'S'){
+                player_2.moverse(1);
+            }
+        fflush(NULL);
+        string s = to_string(player_2.RY());
+        const char* coordenadas = s.c_str();
+
+        char* mensaje = (char *) calloc(strlen(coordenadas) + 1, sizeof (char));
+        sprintf(mensaje, "%s", coordenadas);
+        int largo_mensaje = strlen(mensaje);
+        send(sv, mensaje, largo_mensaje, 0);
+    }
+    std::system("clear");
+    gotoxy(0,0);
+    printf("Presione alguna tecla");
+}
+
+void *recibir_p1(void *data){
+    while (endgame<3){
+        int aux;
+        int n = 0;
+        char buffer[256];
+        char* pbuffer = buffer;
+        if ((n = recv(sv, pbuffer, 256, 0)) > 0) {
+            buffer[256] = '\0';
+            buffer[n] = '\0';
+            aux = stoi(buffer);
+            if(aux == 90) aux = 9;
+            player_1.setY(aux);
+            usleep(50000);
+        }
+    }
+    std::system("clear");
+    gotoxy(0,0);
+    printf("Presione alguna tecla");
+}
+
+void *recibir_p2(void *data){
+    while (endgame<3){
+        int aux;
+        int n = 0;
+        char buffer[256];
+        char* pbuffer = buffer;
+        if ((n = recv(sv, pbuffer, 256, 0)) > 0) {
+            buffer[256] = '\0';
+            buffer[n] = '\0';
+            aux = stoi(buffer);
+            if(aux == 90) aux = 9;
+            player_2.setY(aux);
+            usleep(50000);
+        }
+    }
+    std::system("clear");
+    gotoxy(0,0);
+    printf("Presione alguna tecla");
+}
 
 int main(int argc, char** argv) {
-    pthread_t proceso_pelota;
+    if (argc < 3) {
+        fprintf(stderr, "\nArgumentos insufientes");
+        fprintf(stderr, "\n%s servidor puerto\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    char* nombre_servidor = (char *) calloc(strlen(argv[1]) + 1, sizeof (char));
+    sprintf(nombre_servidor, "%s", argv[1]);
+
+    int puerto_servidor = atoi(argv[2]);
+    fprintf(stdout, "\nServidor: %s:%d\n", nombre_servidor, puerto_servidor);
+
+    struct sockaddr_in servidor;
+    struct hostent *host;
+    if ((host = gethostbyname(nombre_servidor)) == NULL) {
+        /* Se muestra un mensaje de error. */
+        fprintf(stderr, "Nombre del servidor inválido\n");
+        /* El programa termina con error. */
+        return EXIT_FAILURE;
+    }
+
+    memset(&servidor, 0, sizeof (servidor));
+    servidor.sin_family = AF_INET;
+    
+    /*
+     * Transformo desde el host (que resuelve nombre)
+     * a la estructura que lo usa
+     */
+    memcpy(&servidor.sin_addr, host->h_addr_list[0], host->h_length);
+
+    /* La función htons transforma el puerto a formato socket */
+    servidor.sin_port = htons(puerto_servidor);
+
+    /* Se abre el socket */
+    int sock;
+    if ((sock = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+        /* Se muestra un mensaje de error. */
+        fprintf(stderr, "No fue posible crear el socket\n");
+        /* El programa termina con error. */
+        return EXIT_FAILURE;
+    }
+    sv = sock;
+
+    /*
+     * Como el socket es TCP, la conexión debe establecerse primero,
+     * antes de compartir datos.
+     */
+    if (connect(sock, (struct sockaddr*) &servidor, sizeof (servidor)) < 0) {
+        /* Se muestra un mensaje de error. */
+        fprintf(stderr, "No se pudo establecer la comunicacion\n");
+        /* El programa termina con error */
+        return EXIT_FAILURE;
+    }
+
+    pthread_t proceso_jugador;
+    pthread_t proceso_jugador_opuesto;
+
+    int n = 0;
+    char buffer[256];
+    char* pbuffer = buffer;
+    if ((n = recv(sock, pbuffer, 256, 0)) > 0) {
+        buffer[256] = '\0';
+    }
+    if (buffer[0]=='1'){
+        for (int  i = 0; i < 2; i++)
+        {
+            if ((n = recv(sock, pbuffer, 256, 0)) > 0) {
+                buffer[256] = '\0';
+                fprintf(stdout, "Se ha recibido: '%s'\n", buffer);
+            }
+        }
+        gamestartmsg();
+        usleep(1000000);
+        pthread_create(&proceso_jugador,NULL, &movimiento_jugador1 ,NULL);
+        pthread_create(&proceso_jugador_opuesto,NULL, &recibir_p2 ,NULL);
+    }
+    else{
+        if(buffer[0]=='2'){
+            if ((n = recv(sock, pbuffer, 256, 0)) > 0) {
+                buffer[256] = '\0';
+                fprintf(stdout, "Se ha recibido: '%s'\n", buffer);
+            }
+        }
+        gamestartmsg();
+        usleep(1000000);
+        pthread_create(&proceso_jugador,NULL, &movimiento_jugador2 ,NULL);
+        pthread_create(&proceso_jugador_opuesto,NULL, &recibir_p1 ,NULL);
+    }
+    
     pelota ball(39,11,1,1);
     dibujar_tablero();
-    //player_1.dibujar();
+    player_1.dibujar();
     player_2.dibujar();
     printf("\e[?25l");
-    //keyboard teclado;
-    //init_keyboard();
-    pthread_create(&proceso_pelota,NULL, &movimiento_pelota ,NULL);
-    while (true)
+    while (endgame<3)
     {    
-        //init_keyboard();
-        //if(kbhit3()){
-            // char c = getch2();
-            // if (c == 'w' || c == 'W'){
-            //     player_1.moverse(-1);
-            // }
-            // else if(c == 's' || c == 'S'){
-            //     player_1.moverse(1);
-            // }
-        //}
         ball.moverse(player_1,player_2); 
-        usleep(65000);
+        usleep(85000);
         fflush(NULL);
-        // setbuf(stdin,NULL);
-        // __fpurge;
-        //close_keyboard();
     }
-    //close_keyboard();
-    pthread_join(proceso_pelota,NULL);
+    pthread_join(proceso_jugador,NULL);
+    pthread_join(proceso_jugador_opuesto,NULL);
+    usleep(100000);
+    std::system("clear");
+    gotoxy(0,0);
+    printf("################################################################################");
+    printf("Puntos jugador 1: %d   puntos jugador 2: %d \n",puntos_p1,puntos_p2);
     return 0;
 }

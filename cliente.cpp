@@ -15,9 +15,9 @@
  */
 int main(int argc, char** argv) {
 
-    if (argc < 4) {
+    if (argc < 3) {
         fprintf(stderr, "\nArgumentos insufientes");
-        fprintf(stderr, "\n%s servidor puerto 'mensaje'\n", argv[0]);
+        fprintf(stderr, "\n%s servidor puerto\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
@@ -72,28 +72,37 @@ int main(int argc, char** argv) {
      * Preparación de datos a enviar
      * Datos a enviar
      */
-    char* mensaje = (char *) calloc(strlen(argv[3]) + 1, sizeof (char));
-    sprintf(mensaje, "%s", argv[3]);
-    int largo_mensaje = strlen(mensaje);
-    send(sock, mensaje, largo_mensaje, 0);
+    //testing de aca para abajo
+
+    while (true){
+
+        // const char* coordenadas = "1#2#3#4#5#6";
 
 
-    /* Datos para recibir. */
-    int n = 0;
-    int largo = 0;
-    int largo_recibido = (largo_mensaje + 1);
-    char buffer[largo_recibido];
-    char* pbuffer = buffer;
+        // char* mensaje = (char *) calloc(strlen(coordenadas) + 1, sizeof (char));
+        // sprintf(mensaje, "%s", coordenadas);
+        // int largo_mensaje = strlen(mensaje);
+        // send(sock, mensaje, largo_mensaje, 0);
 
-    /* Estaremos esperando datos. */
-    if ((n = recv(sock, pbuffer, largo_recibido, 0)) > 0) {
-        pbuffer += n;
-        largo_recibido -= n;
-        largo += n;
 
-        /* Fin de linea */
-        buffer[largo] = '\0';
-        fprintf(stdout, "Se ha recibido: '%s'\n", buffer);
+        /* Datos para recibir. */
+        int n = 0;
+        //int largo = 0;
+        //int largo_recibido = (largo_mensaje + 1);
+        char buffer[256];
+        char* pbuffer = buffer;
+
+        /* Estaremos esperando datos. */
+        if ((n = recv(sock, pbuffer, 256, 0)) > 0) {
+            //pbuffer += n;
+            //largo_recibido -= n;
+            //largo += n;
+
+            /* Fin de linea */
+            buffer[256] = '\0';
+            fprintf(stdout, "Se ha recibido: '%s'\n", buffer);
+        }
+        // usleep(5000000);
     }
 
     /* Cerramos el socket */
